@@ -17,6 +17,8 @@
     从逻辑上抽象出Scene的概念，方便管理
 ### 6.UI
     UI的管理,抽象出Dialog的概念
+### 7.Toos
+#### 1.csv2ts 将csv(utf8)转成ts文件，csv格式见Test(第一行字段说明，第二行变量名，第三行变量类型(string,number))
 
 
 

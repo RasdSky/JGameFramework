@@ -1,0 +1,4 @@
+怪物ID,怪物名称,血量,攻击力
+ID,name,hp,atk
+number,string,number,number
+10000,狼,10000,1000
