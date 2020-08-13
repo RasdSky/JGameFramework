@@ -1,0 +1,14 @@
+{
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true
+    },
+    "files.exclude": {
+        "**/.rpt2_cache": true,
+        "**/node_modules": true,
+        "**/laya": true
+    },
+    "files.watcherExclude": {
+        "**/node_modules": false
+    },
+}

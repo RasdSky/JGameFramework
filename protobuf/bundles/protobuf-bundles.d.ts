@@ -1,0 +1,2 @@
+type Long = protobuf.Long;
+

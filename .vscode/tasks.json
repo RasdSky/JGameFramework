@@ -1,0 +1,57 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "生成PB",
+            "type": "shell",
+            "command": "pb-egret generate",
+            "problemMatcher": []
+        },
+        // {
+        //     "label": "copy pb-bundles-min",
+        //     "type": "shell",
+        //     "command": "copy .\\protobuf\\bundles\\protobuf-bundles.min.js .\\bin\\libs\\min\\protobuf-bundles.min.js",
+        //     "problemMatcher": [],
+        // },
+        {
+            "label": "copy pb-bundles",
+            "type": "shell",
+            "command": "copy .\\protobuf\\bundles\\protobuf-bundles.js .\\bin\\libs\\protobuf-bundles.js",
+            "problemMatcher": [],
+        },
+        // {
+        //     "label": "copy-library",
+        //     "type": "shell",
+        //     "command": " copy .\\protobuf\\library\\protobuf-library.js .\\bin\\libs\\protobuf-library.js",
+        //     "problemMatcher": [],
+        //     "dependsOn": [
+        //         "copy pb-bundles"
+        //     ]
+        // },
+        {
+            "label": "复制PB",
+            "type": "shell",
+            "command": " copy .\\protobuf\\library\\protobuf-library.js .\\bin\\libs\\protobuf-library.js",
+            "problemMatcher": [],
+            "dependsOn": [
+                "copy pb-bundles",
+                // "copy pb-bundles-min",
+                "copy-library"
+            ]
+        },
+        {
+            "label": "检查代码格式",
+            "type": "shell",
+            "command": "npm run eslint",
+            "problemMatcher": [],
+        },
+        {
+            "label": "编译",
+            "type": "shell",
+            "command": "layaair2-cmd compile",
+            "problemMatcher": [],
+        }
+    ]
+}

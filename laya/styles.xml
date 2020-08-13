@@ -1,0 +1,9 @@
+<res>
+   <item name="res/ui/InnerCity_atlas0.png" type="Sprite" compress="0" pack="1" quality="80" props="" picType="0" scale="0"/>
+   <item name="res/ui/Login_atlas0.png" type="Sprite" compress="0" pack="1" quality="80" props="" picType="0" scale="0"/>
+   <item name="res/ui/Zhandou_atlas0.png" type="Sprite" compress="0" pack="1" quality="80" props="" picType="0" scale="0"/>
+   <item name="res/anim/10000.png" type="Sprite" compress="0" pack="1" quality="80" props="" picType="0" scale="0"/>
+   <item name="res/sprites/anim/10000.png" type="Sprite" compress="0" pack="1" quality="80" props="" picType="0" scale="0"/>
+   <item name="res/sprites/anim/10000" type="" compress="0" pack="1" quality="80" props="" picType="0" scale="0"/>
+   <item name="res/anim/role.ani" type="Sprite" compress="0" pack="0" quality="80" props="" picType="0" scale="0"/>
+</res>
