@@ -1,3 +1,5 @@
+import Log from "../Log/Log";
+
 /*
  * @Author: Ji
  * @Desc: 资源加载,所有资源加载都是异步
@@ -48,6 +50,9 @@ export default class ResMgr {
     }
     public getRes(address: string): any {
         return Laya.loader.getRes(address);
+    }
+    public clearTextureRes(address: string) {
+        Laya.loader.clearTextureRes(address);
     }
     public unloadRes(address: string) {
         Laya.loader.clearRes(address);

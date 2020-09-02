@@ -15,45 +15,53 @@ import netEngine from './Net/NetEngine';
 import baseData from './Data/BaseData';
 import dataMgr from './Data/DataMgr';
 import log from "./Log/Log";
+import com from "./Entity/Com";
+import entity from "./Entity/Entity";
+import input from "./Base/Input";
+import commonFunc from "./Util/CommonFunc"
 export namespace GF {
     /** 
      * 游戏事件系统，常用的事件都写在这里，对应模块如果有需要可以自己创建
      */
-    export class EventSystem extends eventSystem { }
-    export class GameEvent extends gameEvent { }
+    export const EventSystem = eventSystem;
+    export const GameEvent = gameEvent;
     /** 
      * 场景基类
      */
-    export class BaseScene extends baseScene { }
+    export const BaseScene = baseScene;
     /** 
      * 场景管理类
      */
-    export class SceneMgr extends sceneManager { }
+    export const SceneMgr = sceneManager;
     /** 
      * 对话框配置信息
      */
-    export class DialogSetting extends dialogSetting { }
+    export const DialogSetting = dialogSetting;
     /** 
      * 对话框基类
      */
-    export abstract class BaseDialog extends baseDialog { }
+    export const BaseDialog = baseDialog;
     /**
      * 对话框管理
      */
-    export class DialogMgr extends dialogMgr { }
+    export const DialogMgr = dialogMgr;
     /**
      * 资源管理
      */
-    export class ResMgr extends resourMgr { }
+    export const ResMgr = resourMgr;
     /**
      * 网路模块管理
      */
-    export class NetEngine extends netEngine { }
+    export const NetEngine = netEngine;
     /**数据类基类 */
-    export abstract class BaseData extends baseData { }
+    export const BaseData = baseData;
     /**数据管理 */
-    export class DataMgr extends dataMgr { }
+    export const DataMgr = dataMgr;
     /**日志 */
-    export class Log extends log { }
-
+    export const Log = log;
+    export const Com = com;
+    export const Entity = entity;
+    /**输入模块 */
+    export const Input = input;
+    export const CommonFunc = commonFunc;
 }

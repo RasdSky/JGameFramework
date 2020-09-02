@@ -6,11 +6,8 @@ import Sprite = Laya.Sprite;
 export default class BaseScene extends Sprite {
     /**用来存储只有本场景使用的资源 */
     protected resGroup: Array<string>;
-    //当前所有Layer
-    private layers: Array<Sprite>;
     public constructor() {
         super();
-        this.layers = [];
         this.resGroup = [];
     }
     /**

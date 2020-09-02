@@ -1,0 +1,1 @@
+{"type":"Animation","props":{"x":0,"y":0,"presetID":1,"isPresetRoot":true},"compId":3,"child":[{"type":"Script","props":{"presetID":2,"runtime":"Game/Actor/Avatar.ts"},"compId":4}],"loadList":[],"loadList3D":[]}

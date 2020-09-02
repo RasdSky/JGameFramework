@@ -1,11 +1,11 @@
 import { GF } from './GameFramework/GF';
 import LoginScene from './Game/Scene/LoginScene';
 import { Platform } from './Settings/Platform';
-import DialogLogin from './Game/UI/DialogLogin';
-import DialogInnerCity from './Game/UI/DialogInnerCity';
+import UICfg from './Game/UI/UICfg';
 export default class Game {
     public static targetPlatform: Platform;
     public static init(): void {
+        GF.Input.init();
         Laya.stage.frameRate = Laya.Stage.FRAME_MOUSE;//Stage.FRAME_FAST,Stage.FRAME_SLOW,Stage.FRAME_MOUSE
         this.targetPlatform = Platform.MasterDevelopment;
         if (this.targetPlatform == Platform.MasterDevelopment) {
@@ -18,19 +18,13 @@ export default class Game {
             Laya.MiniAdpter.nativefiles = [
             ];
         }
-        this.registerUI();
+        //注册对话框信息
+        UICfg.registerUI();
     }
     public static start(): void {
         fgui.GRoot.inst.displayObject.name = "UI";
         Laya.stage.addChild(fgui.GRoot.inst.displayObject);
         GF.SceneMgr.Instance.changeScene(LoginScene);
         // GF.NetEngine.Instance.connect("172.16.0.82", 8080);
-    }
-    /**
-     * 这里注册UI信息 
-     */
-    public static registerUI(): void {
-        GF.DialogMgr.Instance.registerUI("DialogLogin", new GF.DialogSetting("res/ui/Login", "Login", "DialogLogin", DialogLogin, 8));
-        GF.DialogMgr.Instance.registerUI("DialogInnerCity", new GF.DialogSetting("res/ui/InnerCity", "InnerCity", "DialogInnerCity", DialogInnerCity, 10));
     }
 }

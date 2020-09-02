@@ -1,0 +1,1 @@
+{"type":"Scene","props":{"width":1136,"height":640},"compId":2,"child":[{"type":"Animation","props":{"y":181,"x":401,"presetID":1,"isPresetRoot":true},"compId":3,"child":[{"type":"Script","props":{"presetID":2,"runtime":"Game/Actor/Avatar.ts"},"compId":4}]}],"loadList":["Animation1.prefab","Animation.prefab"],"loadList3D":[]}

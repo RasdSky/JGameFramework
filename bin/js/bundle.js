@@ -2,8 +2,7 @@
     'use strict';
 
     class GameConfig {
-        constructor() {
-        }
+        constructor() { }
         static init() {
             var reg = Laya.ClassUtils.regClass;
         }
@@ -96,8 +95,10 @@
         for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
             t[p] = s[p];
         if (s != null && typeof Object.getOwnPropertySymbols === "function")
-            for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) if (e.indexOf(p[i]) < 0)
-                t[p[i]] = s[p[i]];
+            for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+                if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                    t[p[i]] = s[p[i]];
+            }
         return t;
     }
 
@@ -191,6 +192,14 @@
         return ar;
     }
 
+    function __spreadArrays() {
+        for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+        for (var r = Array(s), k = 0, i = 0; i < il; i++)
+            for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+                r[k] = a[j];
+        return r;
+    };
+
     function __await(v) {
         return this instanceof __await ? (this.v = v, this) : new __await(v);
     }
@@ -242,7 +251,6 @@
     class BaseScene extends Sprite {
         constructor() {
             super();
-            this.layers = [];
             this.resGroup = [];
         }
         onEnter() {
@@ -268,8 +276,8 @@
                 if (this.curScene) {
                     this.curScene.onExit();
                     this.curScene.destroy(true);
+                    Laya.Resource.destroyUnusedResources();
                 }
-                Laya.Resource.destroyUnusedResources();
                 const cur = new Type();
                 yield cur.preload();
                 cur.onEnter();
@@ -432,6 +440,9 @@
         getRes(address) {
             return Laya.loader.getRes(address);
         }
+        clearTextureRes(address) {
+            Laya.loader.clearTextureRes(address);
+        }
         unloadRes(address) {
             Laya.loader.clearRes(address);
         }
@@ -584,87 +595,143 @@
         }
     }
 
-    var GF;
-    (function (GF) {
-        class EventSystem$1 extends EventSystem {
+    class Com {
+        onAwake() {
         }
-        GF.EventSystem = EventSystem$1;
-        class GameEvent$1 extends GameEvent {
-        }
-        GF.GameEvent = GameEvent$1;
-        class BaseScene$1 extends BaseScene {
-        }
-        GF.BaseScene = BaseScene$1;
-        class SceneMgr$1 extends SceneMgr {
-        }
-        GF.SceneMgr = SceneMgr$1;
-        class DialogSetting$1 extends DialogSetting {
-        }
-        GF.DialogSetting = DialogSetting$1;
-        class BaseDialog$1 extends BaseDialog {
-        }
-        GF.BaseDialog = BaseDialog$1;
-        class DialogMgr$1 extends DialogMgr {
-        }
-        GF.DialogMgr = DialogMgr$1;
-        class ResMgr$1 extends ResMgr {
-        }
-        GF.ResMgr = ResMgr$1;
-        class NetEngine$1 extends NetEngine {
-        }
-        GF.NetEngine = NetEngine$1;
-        class BaseData$1 extends BaseData {
-        }
-        GF.BaseData = BaseData$1;
-        class DataMgr$1 extends DataMgr {
-        }
-        GF.DataMgr = DataMgr$1;
-        class Log$1 extends Log {
-        }
-        GF.Log = Log$1;
-    })(GF || (GF = {}));
-
-    class Actor extends Laya.Sprite {
-        play(clipName) {
-            this.clipName = clipName;
+        onDestroy() {
         }
     }
 
-    class AnimData {
+    class Entity {
+        constructor() {
+            this.gameObject = new Laya.Sprite();
+            this.coms = new Map();
+        }
+        addCom(Type) {
+            const comName = Type.name;
+            let com = this.coms.get(comName);
+            if (null == com) {
+                com = new Type();
+                com.entity = this;
+                com.onAwake();
+                this.coms.set(comName, com);
+            }
+            else {
+                Log.error("重复添加Com  " + comName);
+            }
+            return com;
+        }
+        setPosition(x, y) {
+            if (y) {
+                this.gameObject.pos(x, y, true);
+            }
+            else {
+                this.gameObject.x = x;
+            }
+        }
+        getCom(Type) {
+            return this.coms.get(Type.name);
+        }
+        removeCom(Type) {
+            this.coms.delete(Type.name);
+        }
+        destroy() {
+            this.coms.forEach((com) => {
+                com.onDestroy();
+            });
+            this.coms.clear();
+            this.gameObject.destroy();
+        }
     }
-    AnimData.animData = new Map([
-        ["ZS", [{ clip: "attack", frames: 12, loop: false }, { clip: "hold", frames: 10, loop: true }]],
-        ["10000", [{ clip: "attack", frames: 12, loop: false }, { clip: "hold", frames: 10, loop: true }]]
-    ]);
+
+    class Input {
+        static init() {
+            Laya.stage.on(Laya.Event.KEY_DOWN, this, this.onKeyDown);
+            Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
+        }
+        static onKeyUp(event) {
+            this.keys.delete(event.keyCode);
+        }
+        static onKeyDown(event) {
+            this.keys.add(event.keyCode);
+        }
+        static getKeyDown(keyCode) {
+            return this.keys.has(keyCode);
+        }
+    }
+    Input.keys = new Set();
 
     class CommonFunc {
         static prefixInteger(num, length) {
             return ("000000" + num).substr(-length);
         }
+        static frameOnceAsync(delay, caller) {
+            return __awaiter(this, void 0, void 0, function* () {
+                return new Promise(resolve => {
+                    Laya.timer.frameOnce(delay, caller, () => {
+                        resolve();
+                    });
+                });
+            });
+        }
     }
 
-    class Avatar {
+    var GF;
+    (function (GF) {
+        GF.EventSystem = EventSystem;
+        GF.GameEvent = GameEvent;
+        GF.BaseScene = BaseScene;
+        GF.SceneMgr = SceneMgr;
+        GF.DialogSetting = DialogSetting;
+        GF.BaseDialog = BaseDialog;
+        GF.DialogMgr = DialogMgr;
+        GF.ResMgr = ResMgr;
+        GF.NetEngine = NetEngine;
+        GF.BaseData = BaseData;
+        GF.DataMgr = DataMgr;
+        GF.Log = Log;
+        GF.Com = Com;
+        GF.Entity = Entity;
+        GF.Input = Input;
+        GF.CommonFunc = CommonFunc;
+    })(GF || (GF = {}));
+
+    class MonsterCom extends GF.Com {
+        constructor() {
+            super();
+        }
+    }
+
+    const AnimData = new Map([
+        ["ZS", [{ clip: "attack", frames: 12, loop: true }, { clip: "hold", frames: 10, loop: true }]],
+        ["10000", [{ clip: "attack", frames: 12, loop: true }, { clip: "hold", frames: 10, loop: true }]]
+    ]);
+
+    class AnimAvatar {
         constructor() {
             this.animation = new Laya.Animation();
             this.animData = new Map();
         }
-        get container() {
+        get renderObject() {
             return this.animation;
         }
         changeFeature(featureID) {
             return __awaiter(this, void 0, void 0, function* () {
+                this.featureID = featureID;
                 this.isLoaded = false;
-                yield GF.ResMgr.Instance.loadResAsync("res/atlas/sprites/" + featureID + ".atlas");
-                const animData = AnimData.animData.get(featureID);
+                this.atlasPath = "res/atlas/sprites/" + featureID + ".atlas";
+                yield GF.ResMgr.Instance.loadResAsync(this.atlasPath);
+                const animData = AnimData.get(featureID);
                 this.animData.clear();
                 animData.forEach((element) => {
-                    this.animData.set(element.clip, element.loop);
+                    let cachedClipName = featureID + "-" + element.clip;
+                    this.animData.set(cachedClipName, element.loop);
                     const urls = [];
                     for (let i = 0; i < element.frames; i++) {
-                        const str = "sprites/" + featureID + "/" + element.clip + "_" + CommonFunc.prefixInteger(i + 1, 5) + ".png";
+                        const str = "sprites/" + featureID + "/" + element.clip + "_" + GF.CommonFunc.prefixInteger(i + 1, 5) + ".png";
                         urls.push(str);
                     }
-                    this.animation.loadImages(urls, element.clip);
+                    Laya.Animation.createFrames(urls, cachedClipName);
                 });
                 this.isLoaded = true;
                 if (this.clip != null) {
@@ -673,32 +740,73 @@
             });
         }
         play(clip, start = 0) {
-            this.clip = clip;
+            this.clip = this.getCacheClipName(clip);
             if (this.isLoaded) {
-                this.animation.play(start, this.animData[clip], clip);
+                this.animation.play(start, this.animData[this.clip], this.clip);
             }
         }
-        clear() {
+        getCacheClipName(clip) {
+            return this.featureID + "-" + clip;
+        }
+        dispose() {
+            this.animData.forEach((v, k) => {
+                Laya.Animation.clearCache(k);
+            });
             this.animData.clear();
             this.animation.clear();
             this.animation.destroy();
+            GF.ResMgr.Instance.unloadRes(this.atlasPath);
         }
     }
 
-    class Monster extends Actor {
-        constructor() {
-            super();
-            this.body = new Avatar();
-            this.addChild(this.body.container);
+    class MonsterRender extends GF.Com {
+        onAwake() {
+            this.bodyRender = new AnimAvatar();
+            this.entity.gameObject.addChild(this.bodyRender.renderObject);
         }
         changeFeature(featureID) {
             return __awaiter(this, void 0, void 0, function* () {
-                yield this.body.changeFeature(featureID);
+                return this.bodyRender.changeFeature(featureID);
             });
         }
-        play(clipName) {
-            super.play(clipName);
-            this.body.play(this.clipName);
+        play(clip, start = 0) {
+            this.bodyRender.play(clip, start);
+        }
+        onDestroy() {
+            this.bodyRender.dispose();
+        }
+    }
+
+    class MoveCom extends GF.Com {
+        onAwake() {
+            Laya.timer.frameLoop(1, this, this.update);
+        }
+        update() {
+            if (GF.Input.getKeyDown(Laya.Keyboard.W)) {
+                this.entity.gameObject.y -= 1;
+            }
+            if (GF.Input.getKeyDown(Laya.Keyboard.S)) {
+                this.entity.gameObject.y += 1;
+            }
+            if (GF.Input.getKeyDown(Laya.Keyboard.D)) {
+                this.entity.gameObject.x += 1;
+            }
+            if (GF.Input.getKeyDown(Laya.Keyboard.A)) {
+                this.entity.gameObject.x -= 1;
+            }
+        }
+        onDestroy() {
+            Laya.timer.clear(this, this.update);
+        }
+    }
+
+    class EntityFactroy {
+        static createMonster() {
+            const en = new Entity();
+            en.addCom(MonsterRender);
+            en.addCom(MonsterCom);
+            en.addCom(MoveCom);
+            return en;
         }
     }
 
@@ -710,12 +818,16 @@
             return __awaiter(this, void 0, void 0, function* () {
                 _super.onEnter.call(this);
                 GF.DialogMgr.Instance.showDialog("DialogLogin");
-                const mon = new Monster();
-                mon.pos(300, 300);
-                this.addChild(mon);
-                mon.changeFeature("10000");
-                mon.play("attack");
+                this.mon = EntityFactroy.createMonster();
+                const bodyRender = this.mon.getCom(MonsterRender);
+                bodyRender.changeFeature("10000");
+                bodyRender.play("attack");
+                this.addChild(this.mon.gameObject);
+                this.mon.setPosition(300, 300);
             });
+        }
+        onExit() {
+            this.mon.destroy();
         }
     }
 
@@ -766,8 +878,16 @@
         onDestroy() { }
     }
 
+    class UICfg {
+        static registerUI() {
+            GF.DialogMgr.Instance.registerUI("DialogLogin", new GF.DialogSetting("res/ui/Login", "Login", "DialogLogin", DialogLogin, 8));
+            GF.DialogMgr.Instance.registerUI("DialogInnerCity", new GF.DialogSetting("res/ui/InnerCity", "InnerCity", "DialogInnerCity", DialogInnerCity, 10));
+        }
+    }
+
     class Game {
         static init() {
+            GF.Input.init();
             Laya.stage.frameRate = Laya.Stage.FRAME_MOUSE;
             this.targetPlatform = Platform.MasterDevelopment;
             if (this.targetPlatform == Platform.MasterDevelopment) {
@@ -778,16 +898,12 @@
                 Laya.URL.basePath = "http://172.16.0.82:8080/laya/";
                 Laya.MiniAdpter.nativefiles = [];
             }
-            this.registerUI();
+            UICfg.registerUI();
         }
         static start() {
             fgui.GRoot.inst.displayObject.name = "UI";
             Laya.stage.addChild(fgui.GRoot.inst.displayObject);
             GF.SceneMgr.Instance.changeScene(LoginScene);
-        }
-        static registerUI() {
-            GF.DialogMgr.Instance.registerUI("DialogLogin", new GF.DialogSetting("res/ui/Login", "Login", "DialogLogin", DialogLogin, 8));
-            GF.DialogMgr.Instance.registerUI("DialogInnerCity", new GF.DialogSetting("res/ui/InnerCity", "InnerCity", "DialogInnerCity", DialogInnerCity, 10));
         }
     }
 

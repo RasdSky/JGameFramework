@@ -11,6 +11,6 @@
         "**/tools": true,
     },
     "files.watcherExclude": {
-        "**/node_modules": false
-    },
+        "**/node_modules/**": true
+    }
 }

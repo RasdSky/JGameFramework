@@ -1,4 +1,4 @@
-// v1.8.1
+// v1.8.0
 const ideModuleDir = global.ideModuleDir;
 const workSpaceDir = global.workSpaceDir;
 
@@ -9,7 +9,6 @@ const path = require("path");
 const childProcess = require("child_process");
 const del = require(ideModuleDir + "del");
 const revCollector = require(ideModuleDir + 'gulp-rev-collector');
-const iconv =  require(ideModuleDir + "iconv-lite");
 
 let copyLibsTask = ["copyPlatformLibsJsFile"];
 let versiontask = ["version2"];
@@ -300,7 +299,7 @@ gulp.task("buildRPK_OPPO", ["version_OPPO"], function() {
 			cwd: projDir,
 			shell: true
 		};
-		let cp = childProcess.spawn(`"${cmd}"`, args, opts);
+		let cp = childProcess.spawn(cmd, args, opts);
 		// let cp = childProcess.spawn('npx.cmd', ['-v']);
 		cp.stdout.on('data', (data) => {
 			console.log(`stdout: ${data}`);
@@ -308,7 +307,6 @@ gulp.task("buildRPK_OPPO", ["version_OPPO"], function() {
 
 		cp.stderr.on('data', (data) => {
 			console.log(`stderr: ${data}`);
-			console.log(`stderr(iconv): ${iconv.decode(data, 'gbk')}`);
 			// reject();
 		});
 

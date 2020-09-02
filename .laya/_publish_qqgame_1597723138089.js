@@ -1,4 +1,4 @@
-// v1.8.1
+// v1.8.0
 const ideModuleDir = global.ideModuleDir;
 const workSpaceDir = global.workSpaceDir;
 
@@ -160,6 +160,14 @@ gulp.task("pluginEngin_QQ", ["version_QQ"], function(cb) {
 		}
 		gameJsonContent = JSON.stringify(conJson, null, 4);
 		fs.writeFileSync(gameJsonPath, gameJsonContent, "utf8");
+		// 修改project.config.json
+		let projConfigPath = path.join(releaseDir, "project.config.json");
+		let projConfigcontent = fs.readFileSync(projConfigPath, "utf8");
+		let projConfigConJson = JSON.parse(projConfigcontent);
+		projConfigConJson.compileType = "gamePlugin";
+		projConfigConJson.pluginRoot = "laya-libs";
+		projConfigcontent = JSON.stringify(projConfigConJson, null, 4);
+		fs.writeFileSync(projConfigPath, projConfigcontent, "utf8");
 		resolve();
 	}).then(function() {
 		return new Promise(function(resolve, reject) {
@@ -170,14 +178,14 @@ gulp.task("pluginEngin_QQ", ["version_QQ"], function(cb) {
 			let item, fullRequireItem;
 			for (let i = 0, len = fullRemoteEngineList.length; i < len; i++) {
 				item = fullRemoteEngineList[i];
-				fullRequireItem = config.useMinJsLibs ? `require("./libs/min/${item}")` : `require("./libs/${item}")`;
+				fullRequireItem = config.useMinJsLibs ? `loadLib("libs/min/${item}")` : `loadLib("libs/${item}")`;
 				if (indexJsCon.includes(fullRequireItem)) {
 					localUseEngineList.push(item);
 					indexJsCon = indexJsCon.replace(fullRequireItem + ";", "").replace(fullRequireItem + ",", "").replace(fullRequireItem, "");
 				}
 			}
 			if (isOldAsProj || isNewTsProj) { // 如果as||ts_new语言，开发者将laya.js也写入index.js中了，将其删掉
-				fullRequireItem = `require("./laya.js")`;
+				fullRequireItem = `loadLib("laya.js")`;
 				if (indexJsCon.includes(fullRequireItem)) {
 					indexJsCon = indexJsCon.replace(fullRequireItem + ";", "").replace(fullRequireItem + ",", "").replace(fullRequireItem, "");
 				}
@@ -330,20 +338,13 @@ function canUsePluginEngine(version) {
 	const minVersionNum = "2.1.1";
 	let compileMacthList = minVersionNum.match(/^(\d+)\.(\d+)\.(\d+)/);
 	let matchList = version.match(/^(\d+)\.(\d+)\.(\d+)/);
-	let 
-		s1n = Number(matchList[1]), // src first number
-		s2n = Number(matchList[2]),
-		s3n = Number(matchList[3]),
-		t1n = Number(compileMacthList[1]), // to first number
-		t2n = Number(compileMacthList[2]),
-		t3n = Number(compileMacthList[3]);
-    if (s1n > t1n) {
+    if (matchList[1] > compileMacthList[1]) {
         return true;
 	}
-    if (s1n === t1n && s2n > t2n) {
+    if (matchList[1] === compileMacthList[1] && matchList[2] > compileMacthList[2]) {
         return true;
     }
-    if (s1n === t1n && s2n === t2n && s3n >= t3n) {
+    if (matchList[1] === compileMacthList[1] && matchList[2] === compileMacthList[2] && matchList[3] >= compileMacthList[3]) {
         return true;
     }
     return false;
